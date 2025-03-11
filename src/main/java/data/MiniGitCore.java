@@ -18,7 +18,8 @@ public class MiniGitCore {
                     if (isIgnored(file)) {
                         return FileVisitResult.CONTINUE;
                     }
-                    System.out.println(file.toAbsolutePath());
+                    String oid = Repository.hashObject(file.toString(), "blob");
+                    System.out.println(oid + " " + file.toAbsolutePath());
                     return FileVisitResult.CONTINUE;
                 }
 
@@ -27,7 +28,6 @@ public class MiniGitCore {
                     if (isIgnored(dir)) {
                         return FileVisitResult.SKIP_SUBTREE; // 하위 디렉터리 탐색 skip
                     }
-                    System.out.println(dir.toAbsolutePath());
                     return FileVisitResult.CONTINUE;
                 }
             });
