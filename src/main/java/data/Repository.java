@@ -27,17 +27,17 @@ public class Repository {
         return Paths.get(GIT_DIR).toAbsolutePath().toString();
     }
 
-    public static String hashObject(String filePath, String type) {
+    public static String hashObject(String data, String type) {
         try {
             // 파일 읽기
-            byte[] data = Files.readAllBytes(Paths.get(filePath));
+            byte[] content = data.getBytes();
 
             // object = type + NULL byte + 실제 데이터
             byte[] typeBytes = (type + "\0").getBytes();
-            byte[] objectData = new byte[typeBytes.length + data.length];
+            byte[] objectData = new byte[typeBytes.length + content.length];
 
             System.arraycopy(typeBytes, 0, objectData, 0, typeBytes.length);
-            System.arraycopy(data, 0, objectData, typeBytes.length, data.length);
+            System.arraycopy(content, 0, objectData, typeBytes.length, content.length);
 
             // SHA-1 해싱
             MessageDigest sha1 = MessageDigest.getInstance("SHA-1");

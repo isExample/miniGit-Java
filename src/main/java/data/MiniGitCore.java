@@ -3,14 +3,18 @@ package data;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class MiniGitCore {
     public static void init() {
         System.out.println("Initialized empty miniGit repository.");
     }
 
-    public static void writeTree(String directory) {
+    public static String writeTree(String directory) {
         Path rootPath = Paths.get(directory);
+        List<String> entries = new ArrayList<>();
         try {
             Files.walkFileTree(rootPath, new SimpleFileVisitor<Path>() {
                 @Override
@@ -19,21 +23,30 @@ public class MiniGitCore {
                         return FileVisitResult.CONTINUE;
                     }
                     String oid = Repository.hashObject(file.toString(), "blob");
-                    System.out.println(oid + " " + file.toAbsolutePath());
+                    entries.add(String.format("blob %s %s", oid, file.getFileName()));
                     return FileVisitResult.CONTINUE;
                 }
 
                 @Override
                 public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
-                    if (isIgnored(dir)) {
+                    if (isIgnored(dir) || dir.equals(rootPath)) {
                         return FileVisitResult.SKIP_SUBTREE; // 하위 디렉터리 탐색 skip
                     }
+                    String oid = writeTree(dir.toString());
+                    entries.add(String.format("tree %s %s", oid, dir.getFileName()));
                     return FileVisitResult.CONTINUE;
                 }
             });
+
+            // tree object 생성 및 저장
+            Collections.sort(entries);
+            String treeData = String.join("\n", entries) + "\n";
+            return Repository.hashObject(treeData, "tree");
+
         } catch (IOException e) {
             System.err.println("Error: Could not traverse directory.");
             e.printStackTrace();
+            return null;
         }
     }
 
