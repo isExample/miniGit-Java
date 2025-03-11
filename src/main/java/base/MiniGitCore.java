@@ -15,7 +15,13 @@ public class MiniGitCore {
     }
 
     public static String hashObject(String filePath) {
-        return Repository.hashObject(filePath, "blob");
+        try {
+            byte[] fileContent = Files.readAllBytes(Paths.get(filePath));
+            return Repository.hashObject(new String(fileContent), "blob");
+        } catch (IOException e) {
+            System.err.println("Error: Could not read file " + filePath);
+            return null;
+        }
     }
 
     public static byte[] catFile(String oid) {
@@ -32,19 +38,23 @@ public class MiniGitCore {
                     if (isIgnored(file)) {
                         return FileVisitResult.CONTINUE;
                     }
-                    String oid = Repository.hashObject(file.toString(), "blob");
-                    entries.add(String.format("blob %s %s", oid, file.getFileName()));
+                    try {
+                        String oid = Repository.hashObject(new String(Files.readAllBytes(file)), "blob");
+                        entries.add(String.format("blob %s %s", oid, file.getFileName()));
+                    } catch (IOException e) {
+                        System.err.println("Error: Could not read file " + file);
+                    }
                     return FileVisitResult.CONTINUE;
                 }
 
                 @Override
                 public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
                     if (isIgnored(dir) || dir.equals(rootPath)) {
-                        return FileVisitResult.SKIP_SUBTREE; // 하위 디렉터리 탐색 skip
+                        return FileVisitResult.CONTINUE;
                     }
                     String oid = writeTree(dir.toString());
                     entries.add(String.format("tree %s %s", oid, dir.getFileName()));
-                    return FileVisitResult.CONTINUE;
+                    return FileVisitResult.SKIP_SUBTREE;
                 }
             });
 
