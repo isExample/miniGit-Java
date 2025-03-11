@@ -1,6 +1,6 @@
 package cli;
 
-import data.MiniGitCore;
+import base.MiniGitCore;
 import picocli.CommandLine;
 
 @CommandLine.Command(name = "write-tree", description = "Convert directory to tree object and store")

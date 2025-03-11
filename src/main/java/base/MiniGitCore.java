@@ -1,4 +1,6 @@
-package data;
+package base;
+
+import data.Repository;
 
 import java.io.IOException;
 import java.nio.file.*;
@@ -9,7 +11,16 @@ import java.util.List;
 
 public class MiniGitCore {
     public static void init() {
+        Repository.init();
         System.out.println("Initialized empty miniGit repository.");
+    }
+
+    public static String hashObject(String filePath) {
+        return Repository.hashObject(filePath, "blob");
+    }
+
+    public static byte[] catFile(String oid) {
+        return Repository.getObject(oid, null);
     }
 
     public static String writeTree(String directory) {
