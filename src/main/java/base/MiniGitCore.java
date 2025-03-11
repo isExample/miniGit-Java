@@ -17,7 +17,7 @@ public class MiniGitCore {
     public static String hashObject(String filePath) {
         try {
             byte[] fileContent = Files.readAllBytes(Paths.get(filePath));
-            return Repository.hashObject(new String(fileContent), "blob");
+            return Repository.hashObject(fileContent, "blob");
         } catch (IOException e) {
             System.err.println("Error: Could not read file " + filePath);
             return null;
@@ -39,7 +39,7 @@ public class MiniGitCore {
                         return FileVisitResult.CONTINUE;
                     }
                     try {
-                        String oid = Repository.hashObject(new String(Files.readAllBytes(file)), "blob");
+                        String oid = Repository.hashObject(Files.readAllBytes(file), "blob");
                         entries.add(String.format("blob %s %s", oid, file.getFileName()));
                     } catch (IOException e) {
                         System.err.println("Error: Could not read file " + file);

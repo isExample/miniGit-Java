@@ -27,11 +27,12 @@ public class Repository {
         return Paths.get(GIT_DIR).toAbsolutePath().toString();
     }
 
-    public static String hashObject(String data, String type) {
-        try {
-            // 파일 읽기
-            byte[] content = data.getBytes();
+    public static String hashObject(String content, String type) {
+        return hashObject(content.getBytes(), type);
+    }
 
+    public static String hashObject(byte[] content, String type) {
+        try {
             // object = type + NULL byte + 실제 데이터
             byte[] typeBytes = (type + "\0").getBytes();
             byte[] objectData = new byte[typeBytes.length + content.length];
