@@ -52,6 +52,16 @@ public class Repository {
         }
     }
 
+    public static byte[] getObject(String oid) {
+        Path objectPath = Paths.get(OBJECTS_DIR, oid);
+        try {
+            return Files.readAllBytes(objectPath);
+        } catch (IOException e) {
+            System.err.println("Error: Object not found.");
+            return null;
+        }
+    }
+
     private static String bytesToHex(byte[] bytes) {
         StringBuilder sb = new StringBuilder();
         for (byte b : bytes) {
