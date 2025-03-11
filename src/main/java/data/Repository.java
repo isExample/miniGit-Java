@@ -38,7 +38,11 @@ public class Repository {
 
             // 저장 경로 설정
             Path objectPath = Paths.get(OBJECTS_DIR, oid);
-            Files.write(objectPath, data);
+
+            // 중복 저장 방지
+            if(!Files.exists(objectPath)) {
+                Files.write(objectPath, data);
+            }
 
             return oid;
         } catch (IOException | NoSuchAlgorithmException e) {
