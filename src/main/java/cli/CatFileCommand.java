@@ -11,7 +11,7 @@ public class CatFileCommand implements Runnable {
 
     @Override
     public void run() {
-        byte[] data = Repository.getObject(oid);
+        byte[] data = Repository.getObject(oid, null); // null: 타입 검증 없이 데이터 반환
         if (data != null) {
             System.out.write(data, 0, data.length);
         } else {
