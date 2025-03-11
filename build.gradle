@@ -5,3 +5,11 @@ plugins {
 application {
     mainClass = 'cli.Main'
 }
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'info.picocli:picocli:4.7.6'
+}
