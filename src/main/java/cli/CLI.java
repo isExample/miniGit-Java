@@ -6,7 +6,8 @@ import picocli.CommandLine;
         subcommands = {
                 InitCommand.class,
                 HashObjectCommand.class,
-                CatFileCommand.class
+                CatFileCommand.class,
+                WriteTreeCommand.class
         })
 public class CLI {
     public static void run() {

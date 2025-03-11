@@ -1,5 +1,6 @@
 package cli;
 
+import base.MiniGitCore;
 import picocli.CommandLine;
 import data.Repository;
 
@@ -10,7 +11,7 @@ public class HashObjectCommand implements Runnable {
 
     @Override
     public void run() {
-        String oid = Repository.hashObject(filePath, "blob"); // 기본 파일 type
+        String oid = MiniGitCore.hashObject(filePath);
         if (oid != null) {
             System.out.println(oid);
         } else {

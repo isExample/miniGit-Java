@@ -1,6 +1,6 @@
 package cli;
 
-import data.Repository;
+import base.MiniGitCore;
 import picocli.CommandLine;
 
 @CommandLine.Command(name = "cat-file", description = "Print stored object by OID")
@@ -11,7 +11,7 @@ public class CatFileCommand implements Runnable {
 
     @Override
     public void run() {
-        byte[] data = Repository.getObject(oid, null); // null: 타입 검증 없이 데이터 반환
+        byte[] data = MiniGitCore.catFile(oid);
         if (data != null) {
             System.out.write(data, 0, data.length);
         } else {
