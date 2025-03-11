@@ -5,7 +5,8 @@ import picocli.CommandLine;
 @CommandLine.Command(name = "miniGit", mixinStandardHelpOptions = true,
         subcommands = {
                 InitCommand.class,
-                HashObjectCommand.class
+                HashObjectCommand.class,
+                CatFileCommand.class
         })
 public class CLI {
     public static void run() {
