@@ -12,7 +12,6 @@ import java.util.List;
 public class MiniGitCore {
     public static void init() {
         Repository.init();
-        System.out.println("Initialized empty miniGit repository.");
     }
 
     public static String hashObject(String filePath) {
