@@ -68,7 +68,32 @@ public class MiniGitCore {
         }
     }
 
-    public static List<String> iterTreeEntries(String treeOid) {
+    private static Map<String, String> getTree(String treeOid, String basePath) {
+        Map<String, String> result = new HashMap<>();
+        List<String> entries = iterTreeEntries(treeOid);
+        for (String entry : entries) {
+            String[] parts = entry.split(" ", 3);
+            if (parts.length != 3) {
+                System.err.println("Invalid tree entry: " + entry);
+                continue;
+            }
+            String type = parts[0];
+            String oid = parts[1];
+            String name = parts[2];
+            String fullPath = basePath + name;
+
+            if (type.equals("blob")) {
+                result.put(fullPath, oid);
+            } else if (type.equals("tree")) {
+                result.putAll(getTree(oid, fullPath + "/"));
+            } else {
+                throw new RuntimeException("Unknown tree entry type: " + type);
+            }
+        }
+        return result;
+    }
+
+    private static List<String> iterTreeEntries(String treeOid) {
         byte[] treeData = Repository.getObject(treeOid, "tree");
         if (treeData == null) {
             return Collections.emptyList();
