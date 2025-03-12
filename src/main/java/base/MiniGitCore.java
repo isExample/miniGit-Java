@@ -5,9 +5,7 @@ import data.Repository;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class MiniGitCore {
     public static void init() {
@@ -68,6 +66,15 @@ public class MiniGitCore {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public static List<String> iterTreeEntries(String treeOid) {
+        byte[] treeData = Repository.getObject(treeOid, "tree");
+        if (treeData == null) {
+            return Collections.emptyList();
+        }
+        String content = new String(treeData);
+        return Arrays.asList(content.split("\n"));
     }
 
     private static boolean isIgnored(Path path) {
