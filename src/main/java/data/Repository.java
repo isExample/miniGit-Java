@@ -11,6 +11,7 @@ import java.util.Arrays;
 public class Repository {
     private static final String GIT_DIR = ".miniGit";
     private static final String OBJECTS_DIR = GIT_DIR + "/objects";
+    private static final String HEAD_FILE = GIT_DIR + "/HEAD";
 
     public static void init() {
         try {
@@ -91,6 +92,27 @@ public class Repository {
             System.err.println("Error: Object not found or Invalid format.");
             return null;
         }
+    }
+
+    public static void setHEAD(String oid) {
+        try {
+            Files.writeString(Paths.get(HEAD_FILE), oid);
+        } catch (IOException e) {
+            System.out.println("Error: Could not write HEAD");
+            e.printStackTrace();
+        }
+    }
+
+    public static String getHEAD() {
+        Path headPath = Paths.get(HEAD_FILE);
+        if (Files.exists(headPath)) {
+            try {
+                return Files.readString(headPath).trim();
+            } catch (IOException e) {
+                System.out.println("Error: Could not read HEAD.");
+            }
+        }
+        return null;
     }
 
     private static String bytesToHex(byte[] bytes) {

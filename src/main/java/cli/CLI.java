@@ -8,7 +8,8 @@ import picocli.CommandLine;
                 HashObjectCommand.class,
                 CatFileCommand.class,
                 WriteTreeCommand.class,
-                ReadTreeCommand.class
+                ReadTreeCommand.class,
+                CommitCommand.class
         })
 public class CLI {
     public static void run() {
