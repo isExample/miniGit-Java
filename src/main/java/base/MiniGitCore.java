@@ -68,6 +68,22 @@ public class MiniGitCore {
         }
     }
 
+    public static void readTree(String treeOid) {
+        Map<String, String> tree = getTree(treeOid, "./");
+
+        for (Map.Entry<String, String> entry : tree.entrySet()) {
+            String path = entry.getKey();
+            String oid = entry.getValue();
+
+            try {
+                Files.createDirectories(Paths.get(path).getParent());
+                Files.write(Paths.get(path), Repository.getObject(oid, "blob"));
+            } catch (IOException e) {
+                System.err.println("Error: Could not write file " + path);
+            }
+        }
+    }
+
     private static Map<String, String> getTree(String treeOid, String basePath) {
         Map<String, String> result = new HashMap<>();
         List<String> entries = iterTreeEntries(treeOid);
