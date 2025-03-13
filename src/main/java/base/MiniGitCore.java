@@ -69,6 +69,7 @@ public class MiniGitCore {
     }
 
     public static void readTree(String treeOid) {
+        clearWorkingDirectory();
         Map<String, String> tree = getTree(treeOid, "./");
 
         for (Map.Entry<String, String> entry : tree.entrySet()) {
@@ -81,6 +82,35 @@ public class MiniGitCore {
             } catch (IOException e) {
                 System.err.println("Error: Could not write file " + path);
             }
+        }
+    }
+
+    private static void clearWorkingDirectory() {
+        try {
+            Files.walkFileTree(Paths.get("."), new SimpleFileVisitor<Path>() {
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    if (!isIgnored(file)) {
+                        Files.delete(file);
+                    }
+                    return FileVisitResult.CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult postVisitDirectory(Path dir, IOException e) throws IOException {
+                    if (!isIgnored(dir) && !dir.equals(Paths.get("."))) {
+                        try {
+                            Files.delete(dir);
+                        } catch (DirectoryNotEmptyException ignored) {
+                            // 디렉터리에 무시된 파일이 있을 경우 삭제 실패해도 괜찮음
+                        }
+                    }
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+        } catch (IOException e) {
+            System.err.println("Error: Could not clear working directory.");
+            e.printStackTrace();
         }
     }
 
