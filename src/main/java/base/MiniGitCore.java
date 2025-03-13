@@ -94,12 +94,14 @@ public class MiniGitCore {
 
     private static String commitObject(String treeOid, String message) {
         String timestamp = ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
-        String commitData = String.format("tree %s\n", treeOid);
-        commitData += String.format("author MiniGit User\n");
-        commitData += String.format("time %s\n\n", timestamp);
-        commitData += message + "\n";
 
-        return Repository.hashObject(commitData, "commit");
+        StringBuilder commitData = new StringBuilder();
+        commitData.append("tree ").append(treeOid).append("\n");
+        commitData.append("author MiniGit User\n");
+        commitData.append("time ").append(timestamp).append("\n\n");
+        commitData.append(message).append("\n");
+
+        return Repository.hashObject(commitData.toString(), "commit");
     }
 
     private static void clearWorkingDirectory() {
