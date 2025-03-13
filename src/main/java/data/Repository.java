@@ -11,6 +11,7 @@ import java.util.Arrays;
 public class Repository {
     private static final String GIT_DIR = ".miniGit";
     private static final String OBJECTS_DIR = GIT_DIR + "/objects";
+    private static final String HEAD_FILE = GIT_DIR + "/HEAD";
 
     public static void init() {
         try {
@@ -90,6 +91,15 @@ public class Repository {
         } catch (IOException e) {
             System.err.println("Error: Object not found or Invalid format.");
             return null;
+        }
+    }
+
+    public static void setHEAD(String oid) {
+        try {
+            Files.writeString(Paths.get(HEAD_FILE), oid);
+        } catch (IOException e) {
+            System.out.println("Error: Could not write HEAD");
+            e.printStackTrace();
         }
     }
 

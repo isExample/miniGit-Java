@@ -89,7 +89,9 @@ public class MiniGitCore {
 
     public static String commit(String message) {
         String treeOid = writeTree(".");
-        return commitObject(treeOid, message);
+        String commitOid = commitObject(treeOid, message);
+        Repository.setHEAD(commitOid);
+        return commitOid;
     }
 
     private static String commitObject(String treeOid, String message) {
