@@ -102,7 +102,25 @@ public class MiniGitCore {
         return Arrays.asList(content.split("\n"));
     }
 
+    // TODO: 무시할 파일 목록을 별도 설정 파일로 분리 (ex: .minigitignore)
+    private static final Set<String> IGNORED_PATHS = new HashSet<>(Arrays.asList(
+            ".miniGit",
+            ".git",
+            "build",
+            ".gradle",
+            "gradle",
+            "src",
+            ".idea",
+            ".github"
+    ));
+
     private static boolean isIgnored(Path path) {
-        return path.toAbsolutePath().toString().contains(".miniGit");
+        String absolutePath = path.toAbsolutePath().toString();
+        for (String ignored : IGNORED_PATHS) {
+            if (absolutePath.contains(ignored)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
