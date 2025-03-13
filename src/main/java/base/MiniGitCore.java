@@ -95,8 +95,8 @@ public class MiniGitCore {
         return commitOid;
     }
 
-    public static void log() {
-        String oid = Repository.getHEAD();
+    public static void log(String startOid) {
+        String oid = startOid;
         while (oid != null) {
             Commit commit = getCommit(oid);
 
