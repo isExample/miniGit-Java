@@ -95,6 +95,64 @@ public class MiniGitCore {
         return commitOid;
     }
 
+    public static void log(String startOid) {
+        String oid = startOid;
+        if (startOid == null || startOid.isEmpty()) {
+            oid = Repository.getHEAD();
+        }
+        while (oid != null) {
+            Commit commit = getCommit(oid);
+
+            System.out.println("commit " + oid);
+            System.out.println("    " + commit.message.replace("\n", "\n    "));
+            System.out.println();
+
+            oid = commit.parent;
+        }
+    }
+
+    public static Commit getCommit(String oid) {
+        byte[] commitData = Repository.getObject(oid, "commit");
+        if (commitData == null) {
+            throw new IllegalStateException("Commit not found: " + oid);
+        }
+
+        String[] lines = new String(commitData).split("\n");
+        String tree = null;
+        String parent = null;
+        StringBuilder message = new StringBuilder();
+        boolean isMessage = false;
+        for (String line : lines) {
+            if (line.isEmpty()) {
+                isMessage = true; // 빈 줄 이후부터 commit message 시작
+                continue;
+            }
+
+            if (!isMessage) {
+                String[] parts = line.split(" ", 2);
+                if (parts.length < 2) {
+                    continue;
+                }
+                switch (parts[0]) {
+                    case "tree":
+                        tree = parts[1];
+                        break;
+                    case "parent":
+                        parent = parts[1];
+                        break;
+                    case "author":
+                    case "time":
+                        break;
+                    default:
+                        throw new IllegalStateException("Unknown commit field: " + parts[0]);
+                }
+            } else {
+                message.append(line).append("\n");
+            }
+        }
+        return new Commit(tree, parent, message.toString().trim());
+    }
+
     private static String commitObject(String treeOid, String parentOid, String message) {
         String timestamp = ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
 
