@@ -1,5 +1,6 @@
 ### miniGit ###
 .miniGit
+test_workspace/
 
 ### Gradle ###
 .gradle/

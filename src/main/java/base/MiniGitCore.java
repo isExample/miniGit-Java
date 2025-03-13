@@ -111,7 +111,8 @@ public class MiniGitCore {
             "gradle",
             "src",
             ".idea",
-            ".github"
+            ".github",
+            "scripts"
     ));
 
     private static boolean isIgnored(Path path) {
