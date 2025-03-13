@@ -103,6 +103,18 @@ public class Repository {
         }
     }
 
+    public static String getHEAD() {
+        Path headPath = Paths.get(HEAD_FILE);
+        if (Files.exists(headPath)) {
+            try {
+                return Files.readString(headPath).trim();
+            } catch (IOException e) {
+                System.out.println("Error: Could not read HEAD.");
+            }
+        }
+        return null;
+    }
+
     private static String bytesToHex(byte[] bytes) {
         StringBuilder sb = new StringBuilder();
         for (byte b : bytes) {
