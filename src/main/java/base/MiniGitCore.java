@@ -5,6 +5,8 @@ import data.Repository;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class MiniGitCore {
@@ -83,6 +85,21 @@ public class MiniGitCore {
                 System.err.println("Error: Could not write file " + path);
             }
         }
+    }
+
+    public static String commit(String message) {
+        String treeOid = writeTree(".");
+        return commitObject(treeOid, message);
+    }
+
+    private static String commitObject(String treeOid, String message) {
+        String timestamp = ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+        String commitData = String.format("tree %s\n", treeOid);
+        commitData += String.format("author MiniGit User\n");
+        commitData += String.format("time %s\n\n", timestamp);
+        commitData += message + "\n";
+
+        return Repository.hashObject(commitData, "commit");
     }
 
     private static void clearWorkingDirectory() {
