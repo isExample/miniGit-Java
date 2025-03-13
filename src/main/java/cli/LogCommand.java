@@ -11,6 +11,6 @@ public class LogCommand implements Runnable {
 
     @Override
     public void run() {
-        MiniGitCore.log(oid.isEmpty() ? Repository.getHEAD() : oid);
+        MiniGitCore.log(oid);
     }
 }
