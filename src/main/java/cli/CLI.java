@@ -10,7 +10,8 @@ import picocli.CommandLine;
                 WriteTreeCommand.class,
                 ReadTreeCommand.class,
                 CommitCommand.class,
-                LogCommand.class
+                LogCommand.class,
+                CheckoutCommand.class
         })
 public class CLI {
     public static void run() {
