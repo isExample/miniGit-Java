@@ -153,6 +153,12 @@ public class MiniGitCore {
         return new Commit(tree, parent, message.toString().trim());
     }
 
+    public static void checkout(String oid) {
+        Commit commit = getCommit(oid);
+        readTree(commit.tree);
+        Repository.setHEAD(oid);
+    }
+
     private static String commitObject(String treeOid, String parentOid, String message) {
         String timestamp = ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
 
