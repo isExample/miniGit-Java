@@ -168,11 +168,25 @@ public class MiniGitCore {
     }
 
     public static String getOid(String name) {
-        String oid = Repository.getRef(name);
-        if (oid == null) {
+        String[] refsToTry = {
+                name,                       // ex) HEAD, refs/tags/tag1 (전체 경로)
+                "refs/" + name,             // ex) tags/tag1
+                "refs/tags/" + name         // ex) tag1
+        };
+
+        for (String ref : refsToTry) {
+            String oid = Repository.getRef(ref);
+            if (oid != null) {
+                return oid;
+            }
+        }
+
+        // SHA-1 해시인지 확인
+        if (name.matches("^[a-fA-F0-9]{40}$")) {
             return name;
         }
-        return oid;
+
+        throw new IllegalArgumentException("Unknown ref or OID: " + name);
     }
 
     private static String commitObject(String treeOid, String parentOid, String message) {

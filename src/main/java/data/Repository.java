@@ -12,7 +12,6 @@ public class Repository {
     private static final String GIT_DIR = ".miniGit";
     private static final String OBJECTS_DIR = GIT_DIR + "/objects";
     private static final String REFS_DIR = GIT_DIR + "/refs";
-    private static final String TAGS_DIR = REFS_DIR + "/tags";
 
     public static void init() {
         try {
@@ -97,7 +96,7 @@ public class Repository {
 
     public static void updateRef(String ref, String oid) {
         try {
-            Path refPath = getRefPath(ref);
+            Path refPath = Paths.get(GIT_DIR, ref);
             Files.createDirectories(refPath.getParent());
             Files.writeString(refPath, oid.trim());
         } catch (IOException e) {
@@ -107,11 +106,8 @@ public class Repository {
     }
 
     public static String getRef(String ref) {
-        Path refPath = getRefPath(ref);
-        if (!Files.exists(refPath)) {
-            return null;
-        }
-        if (Files.isDirectory(refPath)) {
+        Path refPath = Paths.get(GIT_DIR,ref);
+        if (!Files.exists(refPath) || Files.isDirectory(refPath)) {
             return null;
         }
         try {
@@ -121,13 +117,6 @@ public class Repository {
             e.printStackTrace();
         }
         return null;
-    }
-
-    private static Path getRefPath(String ref) {
-        if (ref.equals("HEAD")) {
-            return Paths.get(GIT_DIR, ref); // .miniGit/HEAD
-        }
-        return Paths.get(TAGS_DIR, ref); // .miniGit/refs/tags/<tags>
     }
 
     private static String bytesToHex(byte[] bytes) {
