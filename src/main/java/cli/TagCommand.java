@@ -10,7 +10,7 @@ public class TagCommand implements Runnable {
     @CommandLine.Parameters(index = "0", description = "Tag name")
     private String name;
 
-    @CommandLine.Parameters(index = "1", description = "Commit OID or ref", arity = "0..1", converter = OidConverter.class)
+    @CommandLine.Parameters(index = "1", description = "Commit OID or ref", defaultValue = "@", converter = OidConverter.class)
     private String oid;
 
     @Override

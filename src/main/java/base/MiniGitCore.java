@@ -168,6 +168,9 @@ public class MiniGitCore {
     }
 
     public static String getOid(String name) {
+        if (name.equals("@")) {
+            name = "HEAD";
+        }
         String[] refsToTry = {
                 name,                       // ex) HEAD, refs/tags/tag1 (전체 경로)
                 "refs/" + name,             // ex) tags/tag1
