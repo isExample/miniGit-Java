@@ -14,11 +14,6 @@ public class TagCommand implements Runnable {
 
     @Override
     public void run() {
-        String targetOid = oid;
-        if (oid == null) {
-            targetOid = Repository.getRef("HEAD");
-        }
-
-        MiniGitCore.createTag(name, targetOid);
+        MiniGitCore.createTag(name, oid);
     }
 }
