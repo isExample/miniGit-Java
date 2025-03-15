@@ -5,7 +5,7 @@ import data.Repository;
 import picocli.CommandLine;
 
 @CommandLine.Command(name = "tag", description = "Create a tag for a commit")
-public class TagCommand implements Runnable{
+public class TagCommand implements Runnable {
     @CommandLine.Parameters(index = "0", description = "Tag name")
     private String name;
 
@@ -13,8 +13,12 @@ public class TagCommand implements Runnable{
     private String oid;
 
     @Override
-    public void run(){
-        String targetOid = (oid != null) ? oid : Repository.getHEAD();
+    public void run() {
+        String targetOid = oid;
+        if (oid == null) {
+            targetOid = Repository.getRef("HEAD");
+        }
+
         MiniGitCore.createTag(name, targetOid);
     }
 }

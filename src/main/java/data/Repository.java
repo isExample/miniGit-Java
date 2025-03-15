@@ -11,7 +11,7 @@ import java.util.Arrays;
 public class Repository {
     private static final String GIT_DIR = ".miniGit";
     private static final String OBJECTS_DIR = GIT_DIR + "/objects";
-    private static final String HEAD_FILE = GIT_DIR + "/HEAD";
+    private static final String REFS_DIR = GIT_DIR + "/refs";
 
     public static void init() {
         try {
@@ -94,22 +94,24 @@ public class Repository {
         }
     }
 
-    public static void setHEAD(String oid) {
+    public static void updateRef(String ref, String oid) {
         try {
-            Files.writeString(Paths.get(HEAD_FILE), oid);
+            Files.createDirectories(Paths.get(REFS_DIR));
+            Files.writeString(Paths.get(REFS_DIR, ref), oid);
         } catch (IOException e) {
-            System.out.println("Error: Could not write HEAD");
+            System.out.println("Error: Could not write ref " + ref);
             e.printStackTrace();
         }
     }
 
-    public static String getHEAD() {
-        Path headPath = Paths.get(HEAD_FILE);
-        if (Files.exists(headPath)) {
+    public static String getRef(String ref) {
+        Path refPath = Paths.get(REFS_DIR, ref);
+        if (Files.exists(refPath)) {
             try {
-                return Files.readString(headPath).trim();
+                return Files.readString(refPath).trim();
             } catch (IOException e) {
-                System.out.println("Error: Could not read HEAD.");
+                System.out.println("Error: Could not read ref " + ref);
+                e.printStackTrace();
             }
         }
         return null;
