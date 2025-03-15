@@ -157,7 +157,7 @@ public class MiniGitCore {
     }
 
     public static void createTag(String name, String oid) {
-        Repository.updateRef(name, oid);
+        Repository.updateRef("refs/tags/" + name, oid);
     }
 
     public static String getOid(String name) {
