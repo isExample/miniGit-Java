@@ -97,9 +97,6 @@ public class MiniGitCore {
 
     public static void log(String startOid) {
         String oid = startOid;
-        if (startOid == null || startOid.isEmpty()) {
-            oid = Repository.getRef("HEAD");
-        }
         while (oid != null) {
             Commit commit = getCommit(oid);
 
@@ -159,11 +156,7 @@ public class MiniGitCore {
         Repository.updateRef("HEAD", oid);
     }
 
-    public static void createTag(String name, String targetOid) {
-        String oid = targetOid;
-        if (oid == null) {
-            oid = Repository.getRef("HEAD");
-        }
+    public static void createTag(String name, String oid) {
         Repository.updateRef(name, oid);
     }
 
