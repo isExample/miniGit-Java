@@ -167,6 +167,14 @@ public class MiniGitCore {
         Repository.updateRef("tags/" + name, oid);
     }
 
+    public static String getOid(String name) {
+        String oid = Repository.getRef(name);
+        if (oid == null) {
+            return name;
+        }
+        return oid;
+    }
+
     private static String commitObject(String treeOid, String parentOid, String message) {
         String timestamp = ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
 
