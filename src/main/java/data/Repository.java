@@ -108,13 +108,17 @@ public class Repository {
 
     public static String getRef(String ref) {
         Path refPath = getRefPath(ref);
-        if (Files.exists(refPath)) {
-            try {
-                return Files.readString(refPath).trim();
-            } catch (IOException e) {
-                System.out.println("Error: Could not read ref " + ref);
-                e.printStackTrace();
-            }
+        if (!Files.exists(refPath)) {
+            return null;
+        }
+        if (Files.isDirectory(refPath)) {
+            return null;
+        }
+        try {
+            return Files.readString(refPath).trim();
+        } catch (IOException e) {
+            System.out.println("Error: Could not read ref " + ref);
+            e.printStackTrace();
         }
         return null;
     }
