@@ -96,9 +96,9 @@ public class Repository {
 
     public static void updateRef(String ref, String oid) {
         try {
-            Path refPath = Paths.get(GIT_DIR, ref);
+            Path refPath = getRefPath(ref);
             Files.createDirectories(refPath.getParent());
-            Files.writeString(refPath, oid);
+            Files.writeString(refPath, oid.trim());
         } catch (IOException e) {
             System.out.println("Error: Could not write ref " + ref);
             e.printStackTrace();
@@ -106,7 +106,7 @@ public class Repository {
     }
 
     public static String getRef(String ref) {
-        Path refPath = Paths.get(GIT_DIR, ref);
+        Path refPath = getRefPath(ref);
         if (Files.exists(refPath)) {
             try {
                 return Files.readString(refPath).trim();
@@ -116,6 +116,13 @@ public class Repository {
             }
         }
         return null;
+    }
+
+    private static Path getRefPath(String ref) {
+        if (ref.equals("HEAD")) {
+            return Paths.get(GIT_DIR, ref); // .miniGit/HEAD
+        }
+        return Paths.get(REFS_DIR, ref); // .miniGit/refs/<ref>
     }
 
     private static String bytesToHex(byte[] bytes) {

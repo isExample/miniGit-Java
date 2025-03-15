@@ -160,7 +160,7 @@ public class MiniGitCore {
     }
 
     public static void createTag(String name, String oid) {
-        Repository.updateRef("refs/tags/" + name, oid);
+        Repository.updateRef("tags/" + name, oid);
     }
 
     private static String commitObject(String treeOid, String parentOid, String message) {
