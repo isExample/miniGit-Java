@@ -11,7 +11,7 @@ import java.util.Arrays;
 public class Repository {
     private static final String GIT_DIR = ".miniGit";
     private static final String OBJECTS_DIR = GIT_DIR + "/objects";
-    private static final String HEAD_FILE = GIT_DIR + "/HEAD";
+    private static final String REFS_DIR = GIT_DIR + "/refs";
 
     public static void init() {
         try {
@@ -94,23 +94,27 @@ public class Repository {
         }
     }
 
-    public static void setHEAD(String oid) {
+    public static void updateRef(String ref, String oid) {
         try {
-            Files.writeString(Paths.get(HEAD_FILE), oid);
+            Path refPath = Paths.get(GIT_DIR, ref);
+            Files.createDirectories(refPath.getParent());
+            Files.writeString(refPath, oid.trim());
         } catch (IOException e) {
-            System.out.println("Error: Could not write HEAD");
+            System.out.println("Error: Could not write ref " + ref);
             e.printStackTrace();
         }
     }
 
-    public static String getHEAD() {
-        Path headPath = Paths.get(HEAD_FILE);
-        if (Files.exists(headPath)) {
-            try {
-                return Files.readString(headPath).trim();
-            } catch (IOException e) {
-                System.out.println("Error: Could not read HEAD.");
-            }
+    public static String getRef(String ref) {
+        Path refPath = Paths.get(GIT_DIR,ref);
+        if (!Files.exists(refPath) || Files.isDirectory(refPath)) {
+            return null;
+        }
+        try {
+            return Files.readString(refPath).trim();
+        } catch (IOException e) {
+            System.out.println("Error: Could not read ref " + ref);
+            e.printStackTrace();
         }
         return null;
     }

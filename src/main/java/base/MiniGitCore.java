@@ -89,17 +89,14 @@ public class MiniGitCore {
 
     public static String commit(String message) {
         String treeOid = writeTree(".");
-        String parentOid = Repository.getHEAD();
+        String parentOid = Repository.getRef("HEAD");
         String commitOid = commitObject(treeOid, parentOid, message);
-        Repository.setHEAD(commitOid);
+        Repository.updateRef("HEAD", commitOid);
         return commitOid;
     }
 
     public static void log(String startOid) {
         String oid = startOid;
-        if (startOid == null || startOid.isEmpty()) {
-            oid = Repository.getHEAD();
-        }
         while (oid != null) {
             Commit commit = getCommit(oid);
 
@@ -156,7 +153,36 @@ public class MiniGitCore {
     public static void checkout(String oid) {
         Commit commit = getCommit(oid);
         readTree(commit.tree);
-        Repository.setHEAD(oid);
+        Repository.updateRef("HEAD", oid);
+    }
+
+    public static void createTag(String name, String oid) {
+        Repository.updateRef("refs/tags/" + name, oid);
+    }
+
+    public static String getOid(String name) {
+        if (name.equals("@")) {
+            name = "HEAD";
+        }
+        String[] refsToTry = {
+                name,                       // ex) HEAD, refs/tags/tag1 (전체 경로)
+                "refs/" + name,             // ex) tags/tag1
+                "refs/tags/" + name         // ex) tag1
+        };
+
+        for (String ref : refsToTry) {
+            String oid = Repository.getRef(ref);
+            if (oid != null) {
+                return oid;
+            }
+        }
+
+        // SHA-1 해시인지 확인
+        if (name.matches("^[a-fA-F0-9]{40}$")) {
+            return name;
+        }
+
+        throw new IllegalArgumentException("Unknown ref or OID: " + name);
     }
 
     private static String commitObject(String treeOid, String parentOid, String message) {
