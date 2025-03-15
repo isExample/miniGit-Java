@@ -12,6 +12,7 @@ public class Repository {
     private static final String GIT_DIR = ".miniGit";
     private static final String OBJECTS_DIR = GIT_DIR + "/objects";
     private static final String REFS_DIR = GIT_DIR + "/refs";
+    private static final String TAGS_DIR = REFS_DIR + "/tags";
 
     public static void init() {
         try {
@@ -122,7 +123,7 @@ public class Repository {
         if (ref.equals("HEAD")) {
             return Paths.get(GIT_DIR, ref); // .miniGit/HEAD
         }
-        return Paths.get(REFS_DIR, ref); // .miniGit/refs/<ref>
+        return Paths.get(TAGS_DIR, ref); // .miniGit/refs/tags/<tags>
     }
 
     private static String bytesToHex(byte[] bytes) {

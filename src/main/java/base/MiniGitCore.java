@@ -164,7 +164,7 @@ public class MiniGitCore {
         if (oid == null) {
             oid = Repository.getRef("HEAD");
         }
-        Repository.updateRef("tags/" + name, oid);
+        Repository.updateRef(name, oid);
     }
 
     public static String getOid(String name) {
