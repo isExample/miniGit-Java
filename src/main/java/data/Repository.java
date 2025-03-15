@@ -96,8 +96,9 @@ public class Repository {
 
     public static void updateRef(String ref, String oid) {
         try {
-            Files.createDirectories(Paths.get(REFS_DIR));
-            Files.writeString(Paths.get(REFS_DIR, ref), oid);
+            Path refPath = Paths.get(GIT_DIR, ref);
+            Files.createDirectories(refPath.getParent());
+            Files.writeString(refPath, oid);
         } catch (IOException e) {
             System.out.println("Error: Could not write ref " + ref);
             e.printStackTrace();
@@ -105,7 +106,7 @@ public class Repository {
     }
 
     public static String getRef(String ref) {
-        Path refPath = Paths.get(REFS_DIR, ref);
+        Path refPath = Paths.get(GIT_DIR, ref);
         if (Files.exists(refPath)) {
             try {
                 return Files.readString(refPath).trim();
