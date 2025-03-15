@@ -159,6 +159,9 @@ public class MiniGitCore {
         Repository.setHEAD(oid);
     }
 
+    public static void createTag(String name, String oid) {
+    }
+
     private static String commitObject(String treeOid, String parentOid, String message) {
         String timestamp = ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
 
