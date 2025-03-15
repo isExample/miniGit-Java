@@ -1,6 +1,7 @@
 package cli;
 
 import base.MiniGitCore;
+import cli.converter.OidConverter;
 import data.Repository;
 import picocli.CommandLine;
 
@@ -9,7 +10,7 @@ public class TagCommand implements Runnable {
     @CommandLine.Parameters(index = "0", description = "Tag name")
     private String name;
 
-    @CommandLine.Parameters(index = "1", description = "Commit OID", arity = "0..1")
+    @CommandLine.Parameters(index = "1", description = "Commit OID or ref", arity = "0..1", converter = OidConverter.class)
     private String oid;
 
     @Override

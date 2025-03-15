@@ -1,12 +1,13 @@
 package cli;
 
 import base.MiniGitCore;
+import cli.converter.OidConverter;
 import picocli.CommandLine;
 
 @CommandLine.Command(name = "cat-file", description = "Print stored object by OID")
 public class CatFileCommand implements Runnable {
 
-    @CommandLine.Parameters(index = "0", description = "Object ID to retrieve")
+    @CommandLine.Parameters(index = "0", description = "Commit OID or ref", converter = OidConverter.class)
     private String oid;
 
     @Override
