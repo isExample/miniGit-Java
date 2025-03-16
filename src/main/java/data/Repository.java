@@ -7,6 +7,8 @@ import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Repository {
     private static final String GIT_DIR = ".miniGit";
@@ -106,7 +108,7 @@ public class Repository {
     }
 
     public static String getRef(String ref) {
-        Path refPath = Paths.get(GIT_DIR,ref);
+        Path refPath = Paths.get(GIT_DIR, ref);
         if (!Files.exists(refPath) || Files.isDirectory(refPath)) {
             return null;
         }
@@ -117,6 +119,33 @@ public class Repository {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static Map<String, String> iterRefs() {
+        Map<String, String> refs = new HashMap<>();
+        String head = getRef("HEAD");
+        if (head != null) {
+            refs.put("HEAD", head);
+        }
+
+        Path refsPath = Paths.get(REFS_DIR);
+        if (Files.exists(refsPath)) {
+            try {
+                Files.walk(refsPath)
+                        .filter(Files::isRegularFile) // 파일만 찾음
+                        .forEach(refFile -> {
+                            String refName = refsPath.relativize(refFile).toString();
+                            String refValue = getRef("refs/" + refName);
+                            if (refValue != null) {
+                                refs.put("refs/" + refName, refValue);
+                            }
+                        });
+            } catch (IOException e) {
+                System.err.println("Error: Could not read refs.");
+                e.printStackTrace();
+            }
+        }
+        return refs;
     }
 
     private static String bytesToHex(byte[] bytes) {

@@ -7,6 +7,6 @@ import picocli.CommandLine;
 public class KCommand implements Runnable {
     @Override
     public void run() {
-        // MiniGitCore 메서드
+        MiniGitCore.listRefs();
     }
 }

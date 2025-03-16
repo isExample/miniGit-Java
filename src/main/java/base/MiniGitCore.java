@@ -200,6 +200,13 @@ public class MiniGitCore {
         return Repository.hashObject(commitData.toString(), "commit");
     }
 
+    public static void listRefs() {
+        Map<String, String> refs = Repository.iterRefs();
+        for (Map.Entry<String, String> ref : refs.entrySet()) {
+            System.out.println(ref.getKey() + " " + ref.getValue());
+        }
+    }
+
     private static void clearWorkingDirectory() {
         try {
             Files.walkFileTree(Paths.get("."), new SimpleFileVisitor<Path>() {
