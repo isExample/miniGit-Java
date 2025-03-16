@@ -204,6 +204,24 @@ public class MiniGitCore {
         return Repository.iterRefs();
     }
 
+    public static List<String> listCommits(Set<String> oids) {
+        Set<String> visited = new HashSet<>();
+        Deque<String> stack = new ArrayDeque<>(oids);
+        while (!stack.isEmpty()) {
+            String oid = stack.pop();
+            if (oid == null || visited.contains(oid)) {
+                continue;
+            }
+            visited.add(oid);
+
+            Commit commit = getCommit(oid);
+            if (commit.parent != null) {
+                stack.add(commit.parent);
+            }
+        }
+        return new ArrayList<>(visited);
+    }
+
     private static void clearWorkingDirectory() {
         try {
             Files.walkFileTree(Paths.get("."), new SimpleFileVisitor<Path>() {
