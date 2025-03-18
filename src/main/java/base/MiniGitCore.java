@@ -95,19 +95,6 @@ public class MiniGitCore {
         return commitOid;
     }
 
-    public static void log(String startOid) {
-        String oid = startOid;
-        while (oid != null) {
-            Commit commit = getCommit(oid);
-
-            System.out.println("commit " + oid);
-            System.out.println("    " + commit.message.replace("\n", "\n    "));
-            System.out.println();
-
-            oid = commit.parent;
-        }
-    }
-
     public static Commit getCommit(String oid) {
         byte[] commitData = Repository.getObject(oid, "commit");
         if (commitData == null) {
@@ -205,21 +192,23 @@ public class MiniGitCore {
     }
 
     public static List<String> listCommits(Set<String> oids) {
+        List<String> orderedCommits = new ArrayList<>();
         Set<String> visited = new HashSet<>();
-        Deque<String> stack = new ArrayDeque<>(oids);
-        while (!stack.isEmpty()) {
-            String oid = stack.pop();
+        Deque<String> queue = new ArrayDeque<>(oids);
+        while (!queue.isEmpty()) {
+            String oid = queue.pollFirst();
             if (oid == null || visited.contains(oid)) {
                 continue;
             }
             visited.add(oid);
+            orderedCommits.add(oid);
 
             Commit commit = getCommit(oid);
             if (commit.parent != null) {
-                stack.add(commit.parent);
+                queue.addFirst(commit.parent);
             }
         }
-        return new ArrayList<>(visited);
+        return orderedCommits;
     }
 
     private static void clearWorkingDirectory() {
