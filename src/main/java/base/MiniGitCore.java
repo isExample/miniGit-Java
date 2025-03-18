@@ -95,19 +95,6 @@ public class MiniGitCore {
         return commitOid;
     }
 
-    public static void log(String startOid) {
-        String oid = startOid;
-        while (oid != null) {
-            Commit commit = getCommit(oid);
-
-            System.out.println("commit " + oid);
-            System.out.println("    " + commit.message.replace("\n", "\n    "));
-            System.out.println();
-
-            oid = commit.parent;
-        }
-    }
-
     public static Commit getCommit(String oid) {
         byte[] commitData = Repository.getObject(oid, "commit");
         if (commitData == null) {
