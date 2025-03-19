@@ -13,7 +13,8 @@ import picocli.CommandLine;
                 LogCommand.class,
                 CheckoutCommand.class,
                 TagCommand.class,
-                KCommand.class
+                KCommand.class,
+                BranchCommand.class
         })
 public class CLI {
     public static void run() {
