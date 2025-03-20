@@ -172,21 +172,6 @@ public class MiniGitCore {
         throw new IllegalArgumentException("Unknown ref or OID: " + name);
     }
 
-    private static String commitObject(String treeOid, String parentOid, String message) {
-        String timestamp = ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
-
-        StringBuilder commitData = new StringBuilder();
-        commitData.append("tree ").append(treeOid).append("\n");
-        if (parentOid != null) {
-            commitData.append("parent ").append(parentOid).append("\n");
-        }
-        commitData.append("author MiniGit User\n");
-        commitData.append("time ").append(timestamp).append("\n\n");
-        commitData.append(message).append("\n");
-
-        return Repository.hashObject(commitData.toString(), "commit");
-    }
-
     public static Map<String, String> listRefs() {
         return Repository.iterRefs();
     }
@@ -209,6 +194,21 @@ public class MiniGitCore {
             }
         }
         return orderedCommits;
+    }
+
+    private static String commitObject(String treeOid, String parentOid, String message) {
+        String timestamp = ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+
+        StringBuilder commitData = new StringBuilder();
+        commitData.append("tree ").append(treeOid).append("\n");
+        if (parentOid != null) {
+            commitData.append("parent ").append(parentOid).append("\n");
+        }
+        commitData.append("author MiniGit User\n");
+        commitData.append("time ").append(timestamp).append("\n\n");
+        commitData.append(message).append("\n");
+
+        return Repository.hashObject(commitData.toString(), "commit");
     }
 
     private static void clearWorkingDirectory() {
