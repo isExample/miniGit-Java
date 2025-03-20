@@ -1,5 +1,6 @@
 package cli;
 
+import base.MiniGitCore;
 import cli.converter.OidConverter;
 import picocli.CommandLine;
 
@@ -13,6 +14,7 @@ public class BranchCommand implements Runnable {
 
     @Override
     public void run() {
-        // MiniGitCore 메서드
+        MiniGitCore.createBranch(name, startPoint);
+        System.out.println("Branch " + name + " created at " + startPoint);
     }
 }

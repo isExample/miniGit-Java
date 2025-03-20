@@ -153,8 +153,9 @@ public class MiniGitCore {
         }
         String[] refsToTry = {
                 name,                       // ex) HEAD, refs/tags/tag1 (전체 경로)
-                "refs/" + name,             // ex) tags/tag1
-                "refs/tags/" + name         // ex) tag1
+                "refs/" + name,             // ex) tags/tag1, heads/branch1
+                "refs/tags/" + name,        // ex) tag1
+                "refs/heads/" + name        // ex) branch1
         };
 
         for (String ref : refsToTry) {
@@ -194,6 +195,10 @@ public class MiniGitCore {
             }
         }
         return orderedCommits;
+    }
+
+    public static void createBranch(String name, String oid) {
+        Repository.updateRef("refs/heads/" + name, oid);
     }
 
     private static String commitObject(String treeOid, String parentOid, String message) {
