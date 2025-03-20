@@ -109,11 +109,16 @@ public class Repository {
 
     public static String getRef(String ref) {
         Path refPath = Paths.get(GIT_DIR, ref);
+        String value = null;
         if (!Files.exists(refPath) || Files.isDirectory(refPath)) {
             return null;
         }
         try {
-            return Files.readString(refPath).trim();
+            value = Files.readString(refPath).trim();
+            if (value != null && value.startsWith("ref:")) {
+                return getRef(value.substring(5));
+            }
+            return value;
         } catch (IOException e) {
             System.out.println("Error: Could not read ref " + ref);
             e.printStackTrace();
