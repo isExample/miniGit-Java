@@ -105,7 +105,10 @@ public class Repository {
     public static void updateRef(String ref, RefValue value, boolean deref) {
         String target = ref;
         if (deref) {
-            target = getRefInternal(ref, deref).ref();
+            RefInternal refInternal = getRefInternal(ref, true);
+            if(refInternal != null){
+                target = refInternal.ref();
+            }
         }
 
         try {
