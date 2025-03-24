@@ -99,6 +99,7 @@ public class Repository {
     }
 
     public static void updateRef(String ref, RefValue value) {
+        ref = getRefInternal(ref).ref();
         try {
             Path refPath = Paths.get(GIT_DIR, ref);
             Files.createDirectories(refPath.getParent());
@@ -114,6 +115,10 @@ public class Repository {
     }
 
     public static RefValue getRef(String ref) {
+        return getRefInternal(ref).value();
+    }
+
+    public static RefInternal getRefInternal(String ref) {
         Path refPath = Paths.get(GIT_DIR, ref);
         String value = null;
         if (!Files.exists(refPath) || Files.isDirectory(refPath)) {
@@ -122,9 +127,9 @@ public class Repository {
         try {
             value = Files.readString(refPath).trim();
             if (value != null && value.startsWith("ref:")) {
-                return getRef(value.substring(5));
+                return getRefInternal(value.substring(5));
             }
-            return RefValue.direct(value);
+            return new RefInternal(ref, RefValue.direct(value));
         } catch (IOException e) {
             System.out.println("Error: Could not read ref " + ref);
             e.printStackTrace();
