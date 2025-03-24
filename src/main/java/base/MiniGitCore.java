@@ -151,6 +151,12 @@ public class MiniGitCore {
         if (name.equals("@")) {
             name = "HEAD";
         }
+
+        // SHA-1 해시인지 확인
+        if (name.matches("^[a-fA-F0-9]{40}$")) {
+            return name;
+        }
+
         String[] refsToTry = {
                 name,                       // ex) HEAD, refs/tags/tag1 (전체 경로)
                 "refs/" + name,             // ex) tags/tag1, heads/branch1
@@ -159,15 +165,15 @@ public class MiniGitCore {
         };
 
         for (String ref : refsToTry) {
-            String oid = Repository.getRef(ref).value();
-            if (oid != null) {
-                return oid;
+            RefValue refValue = Repository.getRef(ref);
+            if(refValue == null){
+                continue;
             }
-        }
 
-        // SHA-1 해시인지 확인
-        if (name.matches("^[a-fA-F0-9]{40}$")) {
-            return name;
+            if (refValue.symbolic()) {
+                return Repository.getRef(ref).value();
+            }
+            return refValue.value();
         }
 
         throw new IllegalArgumentException("Unknown ref or OID: " + name);
