@@ -131,7 +131,11 @@ public class Repository {
     }
 
     public static RefValue getRef(String ref, boolean deref) {
-        return getRefInternal(ref, deref).value();
+        RefInternal internal = getRefInternal(ref, deref);
+        if(internal == null){
+            return null;
+        }
+        return internal.value();
     }
 
     public static RefInternal getRefInternal(String ref, boolean deref) {
