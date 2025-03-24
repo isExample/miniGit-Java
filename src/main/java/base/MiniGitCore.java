@@ -90,7 +90,18 @@ public class MiniGitCore {
 
     public static String commit(String message) {
         String treeOid = writeTree(".");
-        String parentOid = Repository.getRef("HEAD").value();
+
+        RefValue headRef = Repository.getRef("HEAD", false);
+        String parentOid = null;
+        if(headRef != null && !headRef.symbolic()){
+            parentOid = headRef.value(); // detached HEAD
+        } else if(headRef != null){
+            RefValue derefHeadRef = Repository.getRef(headRef.value());
+            if(derefHeadRef != null){
+                parentOid = derefHeadRef.value(); // symbolic ref 역참조값
+            }
+        }
+
         String commitOid = commitObject(treeOid, parentOid, message);
         Repository.updateRef("HEAD", RefValue.direct(commitOid));
         return commitOid;
