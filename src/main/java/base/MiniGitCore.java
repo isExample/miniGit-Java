@@ -12,6 +12,7 @@ import java.util.*;
 public class MiniGitCore {
     public static void init() {
         Repository.init();
+        Repository.updateRef("HEAD", RefValue.symbolic("refs/heads/master"), false);
     }
 
     public static String hashObject(String filePath) {
