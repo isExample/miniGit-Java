@@ -89,9 +89,9 @@ public class MiniGitCore {
 
     public static String commit(String message) {
         String treeOid = writeTree(".");
-        String parentOid = Repository.getRef("HEAD");
+        String parentOid = Repository.getRef("HEAD").value();
         String commitOid = commitObject(treeOid, parentOid, message);
-        Repository.updateRef("HEAD", commitOid);
+        Repository.updateRef("HEAD", RefValue.direct(commitOid));
         return commitOid;
     }
 
@@ -140,11 +140,11 @@ public class MiniGitCore {
     public static void checkout(String oid) {
         Commit commit = getCommit(oid);
         readTree(commit.tree);
-        Repository.updateRef("HEAD", oid);
+        Repository.updateRef("HEAD", RefValue.direct(oid));
     }
 
     public static void createTag(String name, String oid) {
-        Repository.updateRef("refs/tags/" + name, oid);
+        Repository.updateRef("refs/tags/" + name, RefValue.direct(oid));
     }
 
     public static String getOid(String name) {
@@ -159,7 +159,7 @@ public class MiniGitCore {
         };
 
         for (String ref : refsToTry) {
-            String oid = Repository.getRef(ref);
+            String oid = Repository.getRef(ref).value();
             if (oid != null) {
                 return oid;
             }
@@ -198,7 +198,7 @@ public class MiniGitCore {
     }
 
     public static void createBranch(String name, String oid) {
-        Repository.updateRef("refs/heads/" + name, oid);
+        Repository.updateRef("refs/heads/" + name, RefValue.direct(oid));
     }
 
     private static String commitObject(String treeOid, String parentOid, String message) {

@@ -1,5 +1,7 @@
 package data;
 
+import base.RefValue;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -96,18 +98,22 @@ public class Repository {
         }
     }
 
-    public static void updateRef(String ref, String oid) {
+    public static void updateRef(String ref, RefValue value) {
         try {
             Path refPath = Paths.get(GIT_DIR, ref);
             Files.createDirectories(refPath.getParent());
-            Files.writeString(refPath, oid.trim());
+
+            if (value.symbolic()) {
+                Files.writeString(refPath, "ref: " + value.value().trim());
+            }
+            Files.writeString(refPath, value.value().trim());
         } catch (IOException e) {
             System.out.println("Error: Could not write ref " + ref);
             e.printStackTrace();
         }
     }
 
-    public static String getRef(String ref) {
+    public static RefValue getRef(String ref) {
         Path refPath = Paths.get(GIT_DIR, ref);
         String value = null;
         if (!Files.exists(refPath) || Files.isDirectory(refPath)) {
@@ -118,7 +124,7 @@ public class Repository {
             if (value != null && value.startsWith("ref:")) {
                 return getRef(value.substring(5));
             }
-            return value;
+            return RefValue.direct(value);
         } catch (IOException e) {
             System.out.println("Error: Could not read ref " + ref);
             e.printStackTrace();
@@ -128,7 +134,7 @@ public class Repository {
 
     public static Map<String, String> iterRefs() {
         Map<String, String> refs = new HashMap<>();
-        String head = getRef("HEAD");
+        String head = getRef("HEAD").value();
         if (head != null) {
             refs.put("HEAD", head);
         }
@@ -140,7 +146,7 @@ public class Repository {
                         .filter(Files::isRegularFile) // 파일만 찾음
                         .forEach(refFile -> {
                             String refName = refsPath.relativize(refFile).toString();
-                            String refValue = getRef("refs/" + refName);
+                            String refValue = getRef("refs/" + refName).value();
                             if (refValue != null) {
                                 refs.put("refs/" + refName, refValue);
                             }
