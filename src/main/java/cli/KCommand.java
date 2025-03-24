@@ -19,7 +19,9 @@ public class KCommand implements Runnable {
         System.out.println("--Refs--");
         for (Map.Entry<String, RefValue> ref : refs.entrySet()) {
             System.out.println(ref.getKey() + " " + ref.getValue().value());
-            oids.add(ref.getValue().value());
+            if (!ref.getValue().symbolic()) {
+                oids.add(ref.getValue().value());
+            }
         }
 
         List<String> commits = MiniGitCore.listCommits(oids);

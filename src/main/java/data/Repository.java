@@ -162,7 +162,7 @@ public class Repository {
     }
 
     public static Map<String, RefValue> iterRefs() {
-        return iterRefs(true);
+        return iterRefs(false);
     }
 
     public static Map<String, RefValue> iterRefs(boolean deref) {
