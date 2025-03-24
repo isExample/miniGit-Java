@@ -1,5 +1,7 @@
 package data;
 
+import base.RefValue;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -96,24 +98,62 @@ public class Repository {
         }
     }
 
-    public static void updateRef(String ref, String oid) {
+    public static void updateRef(String ref, RefValue value) {
+        updateRef(ref, value, true);
+    }
+
+    public static void updateRef(String ref, RefValue value, boolean deref) {
+        String target = ref;
+        if (deref) {
+            RefInternal refInternal = getRefInternal(ref, true);
+            if (refInternal != null) {
+                target = refInternal.ref();
+            }
+        }
+
         try {
-            Path refPath = Paths.get(GIT_DIR, ref);
+            Path refPath = Paths.get(GIT_DIR, target);
             Files.createDirectories(refPath.getParent());
-            Files.writeString(refPath, oid.trim());
+
+            if (value.symbolic()) {
+                Files.writeString(refPath, "ref: " + value.value().trim());
+            } else {
+                Files.writeString(refPath, value.value().trim());
+            }
         } catch (IOException e) {
             System.out.println("Error: Could not write ref " + ref);
             e.printStackTrace();
         }
     }
 
-    public static String getRef(String ref) {
+    public static RefValue getRef(String ref) {
+        return getRef(ref, true);
+    }
+
+    public static RefValue getRef(String ref, boolean deref) {
+        RefInternal internal = getRefInternal(ref, deref);
+        if (internal == null) {
+            return null;
+        }
+        return internal.value();
+    }
+
+    public static RefInternal getRefInternal(String ref, boolean deref) {
         Path refPath = Paths.get(GIT_DIR, ref);
         if (!Files.exists(refPath) || Files.isDirectory(refPath)) {
             return null;
         }
         try {
-            return Files.readString(refPath).trim();
+            String value = Files.readString(refPath).trim();
+            boolean isSymbolic = value.startsWith("ref:");
+            if (isSymbolic) {
+                String target = value.substring(5);
+                if (deref) {
+                    return getRefInternal(target, true);
+                }
+                return new RefInternal(ref, RefValue.symbolic(target));
+            }
+            return new RefInternal(ref, RefValue.direct(value));
         } catch (IOException e) {
             System.out.println("Error: Could not read ref " + ref);
             e.printStackTrace();
@@ -121,9 +161,13 @@ public class Repository {
         return null;
     }
 
-    public static Map<String, String> iterRefs() {
-        Map<String, String> refs = new HashMap<>();
-        String head = getRef("HEAD");
+    public static Map<String, RefValue> iterRefs() {
+        return iterRefs(false);
+    }
+
+    public static Map<String, RefValue> iterRefs(boolean deref) {
+        Map<String, RefValue> refs = new HashMap<>();
+        RefValue head = getRef("HEAD", deref);
         if (head != null) {
             refs.put("HEAD", head);
         }
@@ -131,11 +175,10 @@ public class Repository {
         Path refsPath = Paths.get(REFS_DIR);
         if (Files.exists(refsPath)) {
             try {
-                Files.walk(refsPath)
-                        .filter(Files::isRegularFile) // 파일만 찾음
+                Files.walk(refsPath).filter(Files::isRegularFile) // 파일만 찾음
                         .forEach(refFile -> {
                             String refName = refsPath.relativize(refFile).toString();
-                            String refValue = getRef("refs/" + refName);
+                            RefValue refValue = getRef("refs/" + refName, deref);
                             if (refValue != null) {
                                 refs.put("refs/" + refName, refValue);
                             }

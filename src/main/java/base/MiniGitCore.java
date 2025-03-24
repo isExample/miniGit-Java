@@ -12,6 +12,7 @@ import java.util.*;
 public class MiniGitCore {
     public static void init() {
         Repository.init();
+        Repository.updateRef("HEAD", RefValue.symbolic("refs/heads/master"), false);
     }
 
     public static String hashObject(String filePath) {
@@ -89,9 +90,20 @@ public class MiniGitCore {
 
     public static String commit(String message) {
         String treeOid = writeTree(".");
-        String parentOid = Repository.getRef("HEAD");
+
+        RefValue headRef = Repository.getRef("HEAD", false);
+        String parentOid = null;
+        if (headRef != null && !headRef.symbolic()) {
+            parentOid = headRef.value(); // detached HEAD
+        } else if (headRef != null) {
+            RefValue derefHeadRef = Repository.getRef(headRef.value());
+            if (derefHeadRef != null) {
+                parentOid = derefHeadRef.value(); // symbolic ref 역참조값
+            }
+        }
+
         String commitOid = commitObject(treeOid, parentOid, message);
-        Repository.updateRef("HEAD", commitOid);
+        Repository.updateRef("HEAD", RefValue.direct(commitOid));
         return commitOid;
     }
 
@@ -137,31 +149,28 @@ public class MiniGitCore {
         return new Commit(tree, parent, message.toString().trim());
     }
 
-    public static void checkout(String oid) {
+    public static void checkout(String name) {
+        String oid = getOid(name);
         Commit commit = getCommit(oid);
         readTree(commit.tree);
-        Repository.updateRef("HEAD", oid);
+
+        RefValue head;
+        if (isBranch(name)) {
+            head = RefValue.symbolic("refs/heads/" + name);
+        } else {
+            head = RefValue.direct(oid);
+        }
+
+        Repository.updateRef("HEAD", head, false);
     }
 
     public static void createTag(String name, String oid) {
-        Repository.updateRef("refs/tags/" + name, oid);
+        Repository.updateRef("refs/tags/" + name, RefValue.direct(oid));
     }
 
     public static String getOid(String name) {
         if (name.equals("@")) {
             name = "HEAD";
-        }
-        String[] refsToTry = {
-                name,                       // ex) HEAD, refs/tags/tag1 (전체 경로)
-                "refs/" + name,             // ex) tags/tag1
-                "refs/tags/" + name         // ex) tag1
-        };
-
-        for (String ref : refsToTry) {
-            String oid = Repository.getRef(ref);
-            if (oid != null) {
-                return oid;
-            }
         }
 
         // SHA-1 해시인지 확인
@@ -169,25 +178,29 @@ public class MiniGitCore {
             return name;
         }
 
+        String[] refsToTry = {
+                name,                       // ex) HEAD, refs/tags/tag1 (전체 경로)
+                "refs/" + name,             // ex) tags/tag1, heads/branch1
+                "refs/tags/" + name,        // ex) tag1
+                "refs/heads/" + name        // ex) branch1
+        };
+
+        for (String ref : refsToTry) {
+            RefValue refValue = Repository.getRef(ref);
+            if (refValue == null) {
+                continue;
+            }
+
+            if (refValue.symbolic()) {
+                return Repository.getRef(ref).value();
+            }
+            return refValue.value();
+        }
+
         throw new IllegalArgumentException("Unknown ref or OID: " + name);
     }
 
-    private static String commitObject(String treeOid, String parentOid, String message) {
-        String timestamp = ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
-
-        StringBuilder commitData = new StringBuilder();
-        commitData.append("tree ").append(treeOid).append("\n");
-        if (parentOid != null) {
-            commitData.append("parent ").append(parentOid).append("\n");
-        }
-        commitData.append("author MiniGit User\n");
-        commitData.append("time ").append(timestamp).append("\n\n");
-        commitData.append(message).append("\n");
-
-        return Repository.hashObject(commitData.toString(), "commit");
-    }
-
-    public static Map<String, String> listRefs() {
+    public static Map<String, RefValue> listRefs() {
         return Repository.iterRefs();
     }
 
@@ -209,6 +222,30 @@ public class MiniGitCore {
             }
         }
         return orderedCommits;
+    }
+
+    public static void createBranch(String name, String oid) {
+        Repository.updateRef("refs/heads/" + name, RefValue.direct(oid));
+    }
+
+    private static boolean isBranch(String name) {
+        RefValue ref = Repository.getRef("refs/heads/" + name, false);
+        return ref != null;
+    }
+
+    private static String commitObject(String treeOid, String parentOid, String message) {
+        String timestamp = ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+
+        StringBuilder commitData = new StringBuilder();
+        commitData.append("tree ").append(treeOid).append("\n");
+        if (parentOid != null) {
+            commitData.append("parent ").append(parentOid).append("\n");
+        }
+        commitData.append("author MiniGit User\n");
+        commitData.append("time ").append(timestamp).append("\n\n");
+        commitData.append(message).append("\n");
+
+        return Repository.hashObject(commitData.toString(), "commit");
     }
 
     private static void clearWorkingDirectory() {
