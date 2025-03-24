@@ -6,7 +6,7 @@ import picocli.CommandLine;
 
 @CommandLine.Command(name = "checkout", description = "Checkout a commit and update HEAD")
 public class CheckoutCommand implements Runnable{
-    @CommandLine.Parameters(index = "0", description = "Commit OID or ref", converter = OidConverter.class)
+    @CommandLine.Parameters(index = "0", description = "Commit OID or ref")
     private String oid;
 
     @Override

@@ -137,10 +137,19 @@ public class MiniGitCore {
         return new Commit(tree, parent, message.toString().trim());
     }
 
-    public static void checkout(String oid) {
+    public static void checkout(String name) {
+        String oid = getOid(name);
         Commit commit = getCommit(oid);
         readTree(commit.tree);
-        Repository.updateRef("HEAD", RefValue.direct(oid));
+
+        RefValue head;
+        if(isBranch(name)){
+            head = RefValue.symbolic("refs/heads/" + name);
+        } else{
+            head = RefValue.direct(oid);
+        }
+
+        Repository.updateRef("HEAD", head, false);
     }
 
     public static void createTag(String name, String oid) {
@@ -205,6 +214,11 @@ public class MiniGitCore {
 
     public static void createBranch(String name, String oid) {
         Repository.updateRef("refs/heads/" + name, RefValue.direct(oid));
+    }
+
+    private static boolean isBranch(String name){
+        RefValue ref = Repository.getRef("refs/heads/" + name, false);
+        return ref != null;
     }
 
     private static String commitObject(String treeOid, String parentOid, String message) {
