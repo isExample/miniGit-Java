@@ -93,11 +93,11 @@ public class MiniGitCore {
 
         RefValue headRef = Repository.getRef("HEAD", false);
         String parentOid = null;
-        if(headRef != null && !headRef.symbolic()){
+        if (headRef != null && !headRef.symbolic()) {
             parentOid = headRef.value(); // detached HEAD
-        } else if(headRef != null){
+        } else if (headRef != null) {
             RefValue derefHeadRef = Repository.getRef(headRef.value());
-            if(derefHeadRef != null){
+            if (derefHeadRef != null) {
                 parentOid = derefHeadRef.value(); // symbolic ref 역참조값
             }
         }
@@ -155,9 +155,9 @@ public class MiniGitCore {
         readTree(commit.tree);
 
         RefValue head;
-        if(isBranch(name)){
+        if (isBranch(name)) {
             head = RefValue.symbolic("refs/heads/" + name);
-        } else{
+        } else {
             head = RefValue.direct(oid);
         }
 
@@ -187,7 +187,7 @@ public class MiniGitCore {
 
         for (String ref : refsToTry) {
             RefValue refValue = Repository.getRef(ref);
-            if(refValue == null){
+            if (refValue == null) {
                 continue;
             }
 
@@ -228,7 +228,7 @@ public class MiniGitCore {
         Repository.updateRef("refs/heads/" + name, RefValue.direct(oid));
     }
 
-    private static boolean isBranch(String name){
+    private static boolean isBranch(String name) {
         RefValue ref = Repository.getRef("refs/heads/" + name, false);
         return ref != null;
     }

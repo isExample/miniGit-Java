@@ -106,7 +106,7 @@ public class Repository {
         String target = ref;
         if (deref) {
             RefInternal refInternal = getRefInternal(ref, true);
-            if(refInternal != null){
+            if (refInternal != null) {
                 target = refInternal.ref();
             }
         }
@@ -117,7 +117,7 @@ public class Repository {
 
             if (value.symbolic()) {
                 Files.writeString(refPath, "ref: " + value.value().trim());
-            } else{
+            } else {
                 Files.writeString(refPath, value.value().trim());
             }
         } catch (IOException e) {
@@ -132,7 +132,7 @@ public class Repository {
 
     public static RefValue getRef(String ref, boolean deref) {
         RefInternal internal = getRefInternal(ref, deref);
-        if(internal == null){
+        if (internal == null) {
             return null;
         }
         return internal.value();
