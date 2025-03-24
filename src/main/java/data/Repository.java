@@ -154,13 +154,13 @@ public class Repository {
         return null;
     }
 
-    public static Map<String, String> iterRefs() {
+    public static Map<String, RefValue> iterRefs() {
         return iterRefs(true);
     }
 
-    public static Map<String, String> iterRefs(boolean deref) {
-        Map<String, String> refs = new HashMap<>();
-        String head = getRef("HEAD", deref).value();
+    public static Map<String, RefValue> iterRefs(boolean deref) {
+        Map<String, RefValue> refs = new HashMap<>();
+        RefValue head = getRef("HEAD", deref);
         if (head != null) {
             refs.put("HEAD", head);
         }
@@ -171,7 +171,7 @@ public class Repository {
                 Files.walk(refsPath).filter(Files::isRegularFile) // 파일만 찾음
                         .forEach(refFile -> {
                             String refName = refsPath.relativize(refFile).toString();
-                            String refValue = getRef("refs/" + refName, deref).value();
+                            RefValue refValue = getRef("refs/" + refName, deref);
                             if (refValue != null) {
                                 refs.put("refs/" + refName, refValue);
                             }

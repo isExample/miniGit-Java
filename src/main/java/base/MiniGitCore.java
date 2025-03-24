@@ -173,7 +173,7 @@ public class MiniGitCore {
         throw new IllegalArgumentException("Unknown ref or OID: " + name);
     }
 
-    public static Map<String, String> listRefs() {
+    public static Map<String, RefValue> listRefs() {
         return Repository.iterRefs();
     }
 
