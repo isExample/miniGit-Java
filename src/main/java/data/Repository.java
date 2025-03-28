@@ -13,22 +13,24 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Repository {
+    public static Path baseDir = Paths.get("").toAbsolutePath();
     private static final String GIT_DIR = ".miniGit";
     private static final String OBJECTS_DIR = GIT_DIR + "/objects";
     private static final String REFS_DIR = GIT_DIR + "/refs";
 
     public static void init(){
-        init("");
+        init(null);
     }
 
     public static void init(String path) {
-        Path baseDir = path.isEmpty()
-                ? Paths.get("").toAbsolutePath()
-                : Paths.get(path).toAbsolutePath();
+        if(path != null){
+            baseDir = Paths.get(path).toAbsolutePath();
+        }
+
         try {
-            Files.createDirectories(baseDir.resolve(GIT_DIR));
-            Files.createDirectories(baseDir.resolve(OBJECTS_DIR));
-            System.out.println("Initialized empty miniGit repository in " + baseDir.resolve(GIT_DIR));
+            Files.createDirectories(getGitDir());
+            Files.createDirectories(getObjectsDir());
+            System.out.println("Initialized empty miniGit repository in " + getGitDir());
         } catch (IOException e) {
             System.err.println("Error: Could not create .miniGit directory.");
             e.printStackTrace();
@@ -58,7 +60,7 @@ public class Repository {
             String oid = bytesToHex(hash);
 
             // 저장 경로 설정
-            Path objectPath = Paths.get(OBJECTS_DIR, oid);
+            Path objectPath = getObjectsDir().resolve(oid);
 
             // 중복 저장 방지
             if (!Files.exists(objectPath)) {
@@ -74,7 +76,7 @@ public class Repository {
     }
 
     public static byte[] getObject(String oid, String expectedType) {
-        Path objectPath = Paths.get(OBJECTS_DIR, oid);
+        Path objectPath = getObjectsDir().resolve(oid);
         try {
             byte[] objectData = Files.readAllBytes(objectPath);
 
@@ -204,6 +206,14 @@ public class Repository {
             sb.append(String.format("%02x", b));
         }
         return sb.toString();
+    }
+
+    private static Path getGitDir(){
+        return baseDir.resolve(GIT_DIR);
+    }
+
+    private static Path getObjectsDir() {
+        return baseDir.resolve(OBJECTS_DIR);
     }
 
 }
