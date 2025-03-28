@@ -1,6 +1,6 @@
 package integration;
 
-import data.Repository;
+import base.MiniGitCore;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -16,7 +16,7 @@ public class InitCommandTest {
     void testInitCreatesMiniGitRepository() {
         Path basePath = tempDir.resolve("repo");
 
-        Repository.init(basePath.toString());
+        MiniGitCore.init(basePath.toString());
 
         Path gitDir = basePath.resolve(".miniGit");
         Path objects = gitDir.resolve("objects");

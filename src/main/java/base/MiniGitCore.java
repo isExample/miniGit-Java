@@ -15,6 +15,11 @@ public class MiniGitCore {
         Repository.updateRef("HEAD", RefValue.symbolic("refs/heads/master"), false);
     }
 
+    public static void init(String path){
+        Repository.init(path);
+        Repository.updateRef("HEAD", RefValue.symbolic("refs/heads/master"), false);
+    }
+
     public static String hashObject(String filePath) {
         try {
             byte[] fileContent = Files.readAllBytes(Paths.get(filePath));
