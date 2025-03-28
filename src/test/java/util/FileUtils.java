@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class TestUtils {
+public class FileUtils {
     public static void writeFile(Path dir, String name, String content) throws IOException {
         Path file = dir.resolve(name);
         Files.createDirectories(file.getParent());
