@@ -12,6 +12,10 @@ public class CatFileCommand implements Runnable {
 
     @Override
     public void run() {
+        if (oid == null) {
+            return;
+        }
+
         byte[] data = MiniGitCore.catFile(oid);
         if (data != null) {
             System.out.write(data, 0, data.length);
