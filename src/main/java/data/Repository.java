@@ -17,11 +17,18 @@ public class Repository {
     private static final String OBJECTS_DIR = GIT_DIR + "/objects";
     private static final String REFS_DIR = GIT_DIR + "/refs";
 
-    public static void init() {
+    public static void init(){
+        init("");
+    }
+
+    public static void init(String path) {
+        Path baseDir = path.isEmpty()
+                ? Paths.get("").toAbsolutePath()
+                : Paths.get(path).toAbsolutePath();
         try {
-            Files.createDirectories(Paths.get(GIT_DIR));
-            Files.createDirectories(Paths.get(OBJECTS_DIR));
-            System.out.println("Initialized empty miniGit repository in " + Paths.get("").toAbsolutePath() + "/" + GIT_DIR);
+            Files.createDirectories(baseDir.resolve(GIT_DIR));
+            Files.createDirectories(baseDir.resolve(OBJECTS_DIR));
+            System.out.println("Initialized empty miniGit repository in " + baseDir.resolve(GIT_DIR));
         } catch (IOException e) {
             System.err.println("Error: Could not create .miniGit directory.");
             e.printStackTrace();
