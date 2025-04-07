@@ -23,4 +23,15 @@ public class FileUtils {
     public static void deleteFile(Path dir, String name) throws IOException {
         Files.deleteIfExists(dir.resolve(name));
     }
+
+    public static void clearDirectory(Path dir) throws IOException {
+        Files.walk(dir)
+                .filter(path -> !path.startsWith(dir.resolve(".miniGit")))
+                .forEach(path -> {
+                    try {
+                        Files.deleteIfExists(path);
+                    } catch (Exception ignored) {
+                    }
+                });
+    }
 }
