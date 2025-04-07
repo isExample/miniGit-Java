@@ -15,12 +15,13 @@ public class MiniGitCore {
         Repository.updateRef("HEAD", RefValue.symbolic("refs/heads/master"), false);
     }
 
-    public static void init(String path){
+    public static void init(String path) {
         Repository.init(path);
         Repository.updateRef("HEAD", RefValue.symbolic("refs/heads/master"), false);
     }
 
     public static String hashObject(String filePath) {
+        Repository.ensureBaseDir();
         try {
             byte[] fileContent = Files.readAllBytes(Paths.get(filePath));
             return Repository.hashObject(fileContent, "blob");
@@ -31,11 +32,13 @@ public class MiniGitCore {
     }
 
     public static byte[] catFile(String oid) {
+        Repository.ensureBaseDir();
         return Repository.getObject(oid, null);
     }
 
     public static String writeTree(String directory) {
-        Path rootPath = Paths.get(directory);
+        Repository.ensureBaseDir();
+        Path rootPath = Repository.baseDir.resolve(directory);
         List<String> entries = new ArrayList<>();
         try {
             Files.walkFileTree(rootPath, new SimpleFileVisitor<Path>() {
@@ -46,7 +49,8 @@ public class MiniGitCore {
                     }
                     try {
                         String oid = Repository.hashObject(Files.readAllBytes(file), "blob");
-                        entries.add(String.format("blob %s %s", oid, file.getFileName()));
+                        Path relativePath = Repository.baseDir.relativize(file);
+                        entries.add(String.format("blob %s %s", oid, relativePath.getFileName()));
                     } catch (IOException e) {
                         System.err.println("Error: Could not read file " + file);
                     }
@@ -58,7 +62,7 @@ public class MiniGitCore {
                     if (isIgnored(dir) || dir.equals(rootPath)) {
                         return FileVisitResult.CONTINUE;
                     }
-                    String oid = writeTree(dir.toString());
+                    String oid = writeTree(Repository.baseDir.relativize(dir).toString());
                     entries.add(String.format("tree %s %s", oid, dir.getFileName()));
                     return FileVisitResult.SKIP_SUBTREE;
                 }
@@ -77,16 +81,17 @@ public class MiniGitCore {
     }
 
     public static void readTree(String treeOid) {
+        Repository.ensureBaseDir();
         clearWorkingDirectory();
         Map<String, String> tree = getTree(treeOid, "./");
 
         for (Map.Entry<String, String> entry : tree.entrySet()) {
-            String path = entry.getKey();
+            Path path = Repository.baseDir.resolve(entry.getKey());
             String oid = entry.getValue();
 
             try {
-                Files.createDirectories(Paths.get(path).getParent());
-                Files.write(Paths.get(path), Repository.getObject(oid, "blob"));
+                Files.createDirectories(path.getParent());
+                Files.write(path, Repository.getObject(oid, "blob"));
             } catch (IOException e) {
                 System.err.println("Error: Could not write file " + path);
             }
@@ -94,6 +99,7 @@ public class MiniGitCore {
     }
 
     public static String commit(String message) {
+        Repository.ensureBaseDir();
         String treeOid = writeTree(".");
 
         RefValue headRef = Repository.getRef("HEAD", false);
@@ -113,6 +119,7 @@ public class MiniGitCore {
     }
 
     public static Commit getCommit(String oid) {
+        Repository.ensureBaseDir();
         byte[] commitData = Repository.getObject(oid, "commit");
         if (commitData == null) {
             throw new IllegalStateException("Commit not found: " + oid);
@@ -155,6 +162,7 @@ public class MiniGitCore {
     }
 
     public static void checkout(String name) {
+        Repository.ensureBaseDir();
         String oid = getOid(name);
         Commit commit = getCommit(oid);
         readTree(commit.tree);
@@ -170,10 +178,12 @@ public class MiniGitCore {
     }
 
     public static void createTag(String name, String oid) {
+        Repository.ensureBaseDir();
         Repository.updateRef("refs/tags/" + name, RefValue.direct(oid));
     }
 
     public static String getOid(String name) {
+        Repository.ensureBaseDir();
         if (name.equals("@")) {
             name = "HEAD";
         }
@@ -206,10 +216,12 @@ public class MiniGitCore {
     }
 
     public static Map<String, RefValue> listRefs() {
+        Repository.ensureBaseDir();
         return Repository.iterRefs();
     }
 
     public static List<String> listCommits(Set<String> oids) {
+        Repository.ensureBaseDir();
         List<String> orderedCommits = new ArrayList<>();
         Set<String> visited = new HashSet<>();
         Deque<String> queue = new ArrayDeque<>(oids);
@@ -230,6 +242,7 @@ public class MiniGitCore {
     }
 
     public static void createBranch(String name, String oid) {
+        Repository.ensureBaseDir();
         Repository.updateRef("refs/heads/" + name, RefValue.direct(oid));
     }
 
@@ -254,8 +267,13 @@ public class MiniGitCore {
     }
 
     private static void clearWorkingDirectory() {
+        Path root = Repository.baseDir;
+        if (!Files.exists(root)) {
+            return;
+        }
+
         try {
-            Files.walkFileTree(Paths.get("."), new SimpleFileVisitor<Path>() {
+            Files.walkFileTree(Repository.baseDir, new SimpleFileVisitor<Path>() {
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                     if (!isIgnored(file)) {
@@ -266,7 +284,7 @@ public class MiniGitCore {
 
                 @Override
                 public FileVisitResult postVisitDirectory(Path dir, IOException e) throws IOException {
-                    if (!isIgnored(dir) && !dir.equals(Paths.get("."))) {
+                    if (!isIgnored(dir) && !dir.equals(root)) {
                         try {
                             Files.delete(dir);
                         } catch (DirectoryNotEmptyException ignored) {
