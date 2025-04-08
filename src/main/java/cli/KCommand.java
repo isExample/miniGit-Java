@@ -17,12 +17,14 @@ public class KCommand implements Runnable {
         Map<String, RefValue> refs = MiniGitCore.listRefs();
         Set<String> oids = new HashSet<>();
         System.out.println("--Refs--");
-        for (Map.Entry<String, RefValue> ref : refs.entrySet()) {
-            System.out.println(ref.getKey() + " " + ref.getValue().value());
-            if (!ref.getValue().symbolic()) {
-                oids.add(ref.getValue().value());
-            }
-        }
+        refs.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .forEach(ref -> {
+                    System.out.println(ref.getKey() + " " + ref.getValue().value());
+                    if (!ref.getValue().symbolic()) {
+                        oids.add(ref.getValue().value());
+                    }
+                });
 
         List<String> commits = MiniGitCore.listCommits(oids);
         System.out.println("\n--Commits--");

@@ -6,6 +6,11 @@ import picocli.CommandLine;
 public class OidConverter implements CommandLine.ITypeConverter<String> {
     @Override
     public String convert(String value) {
-        return MiniGitCore.getOid(value);
+        try {
+            return MiniGitCore.getOid(value);
+        } catch (IllegalArgumentException e) {
+            System.out.println("error: " + e.getMessage());
+            return null;
+        }
     }
 }

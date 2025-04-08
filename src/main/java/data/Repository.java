@@ -13,23 +13,52 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Repository {
+    public static Path baseDir = null;
+
     private static final String GIT_DIR = ".miniGit";
     private static final String OBJECTS_DIR = GIT_DIR + "/objects";
     private static final String REFS_DIR = GIT_DIR + "/refs";
 
-    public static void init() {
+    public static void init(){
+        init(null);
+    }
+
+    public static void init(String path) {
+        if(path != null){
+            baseDir = Paths.get(path).toAbsolutePath();
+        } else {
+            baseDir = findRepoRoot(Paths.get("."));
+        }
+
         try {
-            Files.createDirectories(Paths.get(GIT_DIR));
-            Files.createDirectories(Paths.get(OBJECTS_DIR));
-            System.out.println("Initialized empty miniGit repository in " + Paths.get("").toAbsolutePath() + "/" + GIT_DIR);
+            Files.createDirectories(getGitDir());
+            Files.createDirectories(getObjectsDir());
+            System.out.println("Initialized empty miniGit repository in " + getGitDir());
         } catch (IOException e) {
             System.err.println("Error: Could not create .miniGit directory.");
             e.printStackTrace();
         }
     }
 
+    private static Path findRepoRoot(Path start) {
+        Path current = start.toAbsolutePath();
+        while (current != null) {
+            if (Files.exists(current.resolve(GIT_DIR))) {
+                return current;
+            }
+            current = current.getParent();
+        }
+        throw new IllegalStateException(".miniGit repository not found");
+    }
+
+    public static void ensureBaseDir() {
+        if (baseDir == null || !Files.exists(getGitDir())) {
+            baseDir = findRepoRoot(Paths.get("."));
+        }
+    }
+
     public static String getRepoPath() {
-        return Paths.get(GIT_DIR).toAbsolutePath().toString();
+        return getGitDir().toString();
     }
 
     public static String hashObject(String content, String type) {
@@ -51,7 +80,7 @@ public class Repository {
             String oid = bytesToHex(hash);
 
             // 저장 경로 설정
-            Path objectPath = Paths.get(OBJECTS_DIR, oid);
+            Path objectPath = getObjectsDir().resolve(oid);
 
             // 중복 저장 방지
             if (!Files.exists(objectPath)) {
@@ -67,7 +96,7 @@ public class Repository {
     }
 
     public static byte[] getObject(String oid, String expectedType) {
-        Path objectPath = Paths.get(OBJECTS_DIR, oid);
+        Path objectPath = getObjectsDir().resolve(oid);
         try {
             byte[] objectData = Files.readAllBytes(objectPath);
 
@@ -112,7 +141,7 @@ public class Repository {
         }
 
         try {
-            Path refPath = Paths.get(GIT_DIR, target);
+            Path refPath = getGitDir().resolve(target);
             Files.createDirectories(refPath.getParent());
 
             if (value.symbolic()) {
@@ -139,7 +168,7 @@ public class Repository {
     }
 
     public static RefInternal getRefInternal(String ref, boolean deref) {
-        Path refPath = Paths.get(GIT_DIR, ref);
+        Path refPath = getGitDir().resolve(ref);
         if (!Files.exists(refPath) || Files.isDirectory(refPath)) {
             return null;
         }
@@ -172,7 +201,7 @@ public class Repository {
             refs.put("HEAD", head);
         }
 
-        Path refsPath = Paths.get(REFS_DIR);
+        Path refsPath = getRefsDir();
         if (Files.exists(refsPath)) {
             try {
                 Files.walk(refsPath).filter(Files::isRegularFile) // 파일만 찾음
@@ -197,6 +226,18 @@ public class Repository {
             sb.append(String.format("%02x", b));
         }
         return sb.toString();
+    }
+
+    private static Path getGitDir(){
+        return baseDir.resolve(GIT_DIR);
+    }
+
+    private static Path getObjectsDir() {
+        return baseDir.resolve(OBJECTS_DIR);
+    }
+
+    private static Path getRefsDir() {
+        return baseDir.resolve(REFS_DIR);
     }
 
 }

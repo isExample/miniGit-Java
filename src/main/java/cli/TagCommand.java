@@ -15,6 +15,11 @@ public class TagCommand implements Runnable {
 
     @Override
     public void run() {
-        MiniGitCore.createTag(name, oid);
+        try {
+            MiniGitCore.createTag(name, oid);
+            System.out.println("Tag '" + name + "' created at " + oid);
+        } catch (IllegalStateException e) {
+            System.err.println("fatal: " + e.getMessage());
+        }
     }
 }

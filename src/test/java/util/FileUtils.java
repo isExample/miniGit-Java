@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class TestUtils {
+public class FileUtils {
     public static void writeFile(Path dir, String name, String content) throws IOException {
         Path file = dir.resolve(name);
         Files.createDirectories(file.getParent());
@@ -22,5 +22,16 @@ public class TestUtils {
 
     public static void deleteFile(Path dir, String name) throws IOException {
         Files.deleteIfExists(dir.resolve(name));
+    }
+
+    public static void clearDirectory(Path dir) throws IOException {
+        Files.walk(dir)
+                .filter(path -> !path.startsWith(dir.resolve(".miniGit")))
+                .forEach(path -> {
+                    try {
+                        Files.deleteIfExists(path);
+                    } catch (Exception ignored) {
+                    }
+                });
     }
 }
