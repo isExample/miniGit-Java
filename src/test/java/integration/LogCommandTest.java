@@ -12,6 +12,10 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * [의존 명령어]: commit
+ * [기능 설명]: commit 히스토리 출력
+ */
 public class LogCommandTest extends BaseGitTest {
     @Test
     @DisplayName("단일 commit의 log는 해당 메시지 하나만 반환한다.")

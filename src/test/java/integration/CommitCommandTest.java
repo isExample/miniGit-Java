@@ -12,6 +12,10 @@ import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * [의존 명령어]: write-tree
+ * [기능 설명]: commit 객체 생성 및 HEAD 업데이트
+ */
 public class CommitCommandTest extends BaseGitTest {
 
     @Test

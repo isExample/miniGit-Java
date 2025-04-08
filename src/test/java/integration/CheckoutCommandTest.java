@@ -11,6 +11,11 @@ import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * [의존 명령어]: read-tree, commit
+ * [기능 설명]: 특정 commit 혹은 branch로 이동하며 working directory 변경
+ * 참고: 결과 검증을 위해 branch 명령어 기능을 보조적으로 사용
+ */
 public class CheckoutCommandTest extends BaseGitTest {
 
     @Test

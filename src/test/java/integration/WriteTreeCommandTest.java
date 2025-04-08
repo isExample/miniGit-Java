@@ -10,6 +10,11 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * [의존 명령어]: hash-object
+ * [기능 설명]: 디렉터리 구조를 tree 객체로 저장
+ * 참고: 결과 검증을 위해 cat-file 명령어 기능을 보조적으로 사용
+ */
 public class WriteTreeCommandTest extends BaseGitTest {
 
     @Test

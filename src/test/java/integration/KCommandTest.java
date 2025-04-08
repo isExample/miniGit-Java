@@ -15,6 +15,11 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * [의존 명령어]: branch, tag
+ * [기능 설명]: 모든 refs와 관련 commit들을 출력
+ * 참고: 결과 검증을 위해 checkout 명령어 기능을 보조적으로 사용
+ */
 public class KCommandTest extends BaseGitTest {
 
     @Test

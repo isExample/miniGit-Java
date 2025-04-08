@@ -8,6 +8,10 @@ import util.FileUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * [의존 명령어]: hash-object
+ * [기능 설명]: OID를 통해 저장된 blob 객체의 내용을 출력함
+ */
 public class CatFileCommandTest extends BaseGitTest {
     @Test
     @DisplayName("Blob 객체를 OID로 정상적으로 조회할 수 있다.")

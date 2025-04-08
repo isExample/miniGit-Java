@@ -9,6 +9,11 @@ import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * [의존 명령어]: 없음(최초 명령어)
+ * [기능 설명]: miniGit 저장소(.miniGit 디렉터리) 초기화
+ * 참고: 다른 모든 명령어의 전제
+ */
 public class InitCommandTest {
     @TempDir
     Path tempDir;

@@ -12,6 +12,10 @@ import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * [의존 명령어]: init
+ * [기능 설명]: 파일을 blob 객체로 저장하고 SHA-1 OID를 반환함
+ */
 public class HashObjectCommandTest extends BaseGitTest {
 
     @Test

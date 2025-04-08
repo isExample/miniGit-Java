@@ -11,6 +11,10 @@ import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * [의존 명령어]: cat-file, write-tree
+ * [기능 설명]: tree 객체를 바탕으로 working directory 복원
+ */
 public class ReadTreeCommandTest extends BaseGitTest {
 
     @Test

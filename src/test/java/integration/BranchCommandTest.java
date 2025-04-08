@@ -12,6 +12,11 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+/**
+ * [의존 명령어]: commit
+ * [기능 설명]: 특정 commit을 기준으로 branch 생성
+ * 참고: 결과 검증을 위해 k 명령어 기능을 보조적으로 사용
+ */
 public class BranchCommandTest extends BaseGitTest {
 
     @Test
