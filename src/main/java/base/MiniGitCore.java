@@ -243,7 +243,13 @@ public class MiniGitCore {
 
     public static void createBranch(String name, String oid) {
         Repository.ensureBaseDir();
-        Repository.updateRef("refs/heads/" + name, RefValue.direct(oid));
+
+        String branchRef = "refs/heads/" + name;
+        if (Repository.getRef(branchRef) != null) {
+            throw new IllegalStateException("A branch named '" + name + "' already exists.");
+        }
+
+        Repository.updateRef(branchRef, RefValue.direct(oid));
     }
 
     private static boolean isBranch(String name) {

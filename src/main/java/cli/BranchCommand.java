@@ -14,7 +14,11 @@ public class BranchCommand implements Runnable {
 
     @Override
     public void run() {
-        MiniGitCore.createBranch(name, startPoint);
-        System.out.println("Branch " + name + " created at " + startPoint);
+        try {
+            MiniGitCore.createBranch(name, startPoint);
+            System.out.println("Branch " + name + " created at " + startPoint);
+        } catch (IllegalStateException e) {
+            System.err.println("fatal: " + e.getMessage());
+        }
     }
 }
