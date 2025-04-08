@@ -179,7 +179,13 @@ public class MiniGitCore {
 
     public static void createTag(String name, String oid) {
         Repository.ensureBaseDir();
+
         getCommit(oid);
+        RefValue existing = Repository.getRef("refs/tags/" + name, false);
+        if (existing != null) {
+            throw new IllegalStateException("tag '" + name + "' already exists");
+        }
+
         Repository.updateRef("refs/tags/" + name, RefValue.direct(oid));
     }
 
