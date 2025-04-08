@@ -114,7 +114,14 @@ public class MiniGitCore {
         }
 
         String commitOid = commitObject(treeOid, parentOid, message);
-        Repository.updateRef("HEAD", RefValue.direct(commitOid));
+
+        if (headRef != null && headRef.symbolic()) {
+            String symbolicRef = headRef.value(); // refs/heads/master
+            Repository.updateRef(symbolicRef, RefValue.direct(commitOid), false);
+        } else {
+            Repository.updateRef("HEAD", RefValue.direct(commitOid), false);
+        }
+
         return commitOid;
     }
 
