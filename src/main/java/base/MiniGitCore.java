@@ -179,6 +179,7 @@ public class MiniGitCore {
 
     public static void createTag(String name, String oid) {
         Repository.ensureBaseDir();
+        getCommit(oid);
         Repository.updateRef("refs/tags/" + name, RefValue.direct(oid));
     }
 
